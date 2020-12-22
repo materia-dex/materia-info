@@ -53,6 +53,6 @@ export async function getV1Data() {
 
     return data
   } catch (err) {
-    console.log('error: ', err)
+    console.log('error: V1 ', err)
   }
 }
