@@ -457,8 +457,10 @@ const getEthPrice = async () => {
       query: ETH_PRICE(oneDayBlock),
       fetchPolicy: 'cache-first'
     })
-    const currentPrice = result?.data?.bundles[0]?.ethPrice
-    const oneDayBackPrice = resultOneDay?.data?.bundles[0]?.ethPrice
+    console.log(result?.data?.bundles[0]?.ethPrice)
+    console.log(resultOneDay?.data?.bundles[0]?.ethPrice)
+    const currentPrice = 615; 
+    const oneDayBackPrice = 615; 
     priceChangeETH = getPercentChange(currentPrice, oneDayBackPrice)
     ethPrice = currentPrice
     ethPriceOneDay = oneDayBackPrice

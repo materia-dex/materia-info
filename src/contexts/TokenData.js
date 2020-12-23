@@ -260,6 +260,10 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             twoDayHistory?.txCount ?? 0
           )
 
+          console.log("getTopTokens");
+          console.log("data?.totalLiquidity", data?.totalLiquidity);
+          console.log("ethPrice", ethPrice);
+          console.log("data?.derivedETH", data?.derivedETH);
           const currentLiquidityUSD = data?.totalLiquidity * ethPrice * data?.derivedETH
           const oldLiquidityUSD = oneDayHistory?.totalLiquidity * ethPriceOld * oneDayHistory?.derivedETH
 
@@ -286,7 +290,7 @@ const getTopTokens = async (ethPrice, ethPriceOld) => {
             data.oneDayTxns = data.txCount
           }
 
-          if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+          if (data.id === '0x0C0488a2e3f5FdEb482Bf5A76AB1ef27A3658101') {
             data.name = 'Ether (Wrapped)'
             data.symbol = 'ETH'
           }
@@ -408,7 +412,7 @@ const getTokenData = async (address, ethPrice, ethPriceOld) => {
     }
 
     // fix for WETH
-    if (data.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+    if (data.id === '0x0C0488a2e3f5FdEb482Bf5A76AB1ef27A3658101') {
       data.name = 'ETH (Wrapped)'
       data.symbol = 'ETH'
     }

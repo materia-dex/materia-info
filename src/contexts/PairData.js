@@ -284,11 +284,11 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   if (!oneWeekData && data) {
     data.oneWeekVolumeUSD = parseFloat(data.volumeUSD)
   }
-  if (data?.token0?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+  if (data?.token0?.id === '0x0C0488a2e3f5FdEb482Bf5A76AB1ef27A3658101') {
     data.token0.name = 'Ether (Wrapped)'
     data.token0.symbol = 'ETH'
   }
-  if (data?.token1?.id === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') {
+  if (data?.token1?.id === '0x0C0488a2e3f5FdEb482Bf5A76AB1ef27A3658101') {
     data.token1.name = 'Ether (Wrapped)'
     data.token1.symbol = 'ETH'
   }
