@@ -1,6 +1,6 @@
-export const FACTORY_ADDRESS = '0x9Be8177C4395Cc27de34aeB8F231FA39513C155D'
+export const FACTORY_ADDRESS = '0xB498a69fF7b9a73C58491d564Fc6a462b259c860'
 
-export const BUNDLE_ID = '3'
+export const BUNDLE_ID = '1'
 
 export const timeframeOptions = {
   WEEK: '1 week',
