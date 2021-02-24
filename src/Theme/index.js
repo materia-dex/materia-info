@@ -16,7 +16,9 @@ const theme = (darkMode, color) => ({
 
   panelColor: darkMode ? 'rgba(255, 255, 255, 0)' : 'rgba(255, 255, 255, 0)',
   backgroundColor: darkMode ? '#212429' : '#F7F8FA',
-  
+
+  uniswapPink: darkMode ? '#ff007a' : 'black',
+
   concreteGray: darkMode ? '#292C2F' : '#FAFAFA',
   inputBackground: darkMode ? '#1F1F1F' : '#FAFAFA',
   shadowColor: darkMode ? '#000' : '#2F80ED',
@@ -46,33 +48,31 @@ const theme = (darkMode, color) => ({
   divider: darkMode ? 'rgba(43, 43, 43, 0.435)' : 'rgba(43, 43, 43, 0.035)',
 
   //primary colors
-  primary1: darkMode ? '#2172E5' : '#2172E5',
+  primary1: darkMode ? '#2172E5' : '#ff007a',
   primary2: darkMode ? '#3680E7' : '#FF8CC3',
   primary3: darkMode ? '#4D8FEA' : '#FF99C9',
   primary4: darkMode ? '#376bad70' : '#F6DDE8',
   primary5: darkMode ? '#153d6f70' : '#FDEAF1',
 
   // color text
-  primaryText1: darkMode ? '#6da8ff' : '#2172E5',
+  primaryText1: darkMode ? '#6da8ff' : '#ff007a',
 
   // secondary colors
-  secondary1: darkMode ? '#2172E5' : '#2172E5',
+  secondary1: darkMode ? '#2172E5' : '#ff007a',
   secondary2: darkMode ? '#17000b26' : '#F6DDE8',
   secondary3: darkMode ? '#17000b26' : '#FDEAF1',
 
   shadow1: darkMode ? '#000' : '#2F80ED',
 
   // other
-  // red1: '#FF6871',
+  red1: '#FF6871',
   green1: '#27AE60',
   yellow1: '#FFE270',
   yellow2: '#F3841E',
   link: '#2172E5',
   blue: '2f80ed',
 
-  red1: darkMode ? '#2172E5' : '#2172E5',
-
-  // background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`
+  background: darkMode ? 'black' : `radial-gradient(50% 50% at 50% 50%, #ff007a30 0%, #fff 0%)`,
 })
 
 const TextWrapper = styled(Text)`
@@ -106,7 +106,7 @@ export const TYPE = {
 
   pink(props) {
     return <TextWrapper fontWeight={props.faded ? 400 : 600} color={props.faded ? 'text1' : 'text1'} {...props} />
-  }
+  },
 }
 
 export const Hover = styled.div`
@@ -117,7 +117,7 @@ export const Hover = styled.div`
 
 export const Link = styled.a.attrs({
   target: '_blank',
-  rel: 'noopener noreferrer'
+  rel: 'noopener noreferrer',
 })`
   text-decoration: none;
   cursor: pointer;
@@ -144,11 +144,12 @@ export const ThemedBackground = styled.div`
   max-width: 100vw !important;
   height: 200vh;
   mix-blend-mode: color;
-  // background: ${({ backgroundColor }) => `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
+  background: ${({ backgroundColor }) =>
+    `radial-gradient(50% 50% at 50% 50%, ${backgroundColor} 0%, rgba(255, 255, 255, 0) 100%)`};
   position: absolute;
   top: 0px;
   left: 0px;
-  z-index: 9999;
+  /* z-index: ; */
 
   transform: translateY(-110vh);
 `

@@ -11,13 +11,14 @@ import { useAllPairData, usePairData } from '../../contexts/PairData'
 import DoubleTokenLogo from '../DoubleLogo'
 import { useMedia } from 'react-use'
 import { useAllPairsInMateria, useAllTokensInMateria } from '../../contexts/GlobalData'
-import { OVERVIEW_TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
+import { TOKEN_BLACKLIST, PAIR_BLACKLIST } from '../../constants'
 
 import { transparentize } from 'polished'
 import { client } from '../../apollo/client'
 import { PAIR_SEARCH, TOKEN_SEARCH } from '../../apollo/queries'
 import FormattedName from '../FormattedName'
 import { TYPE } from '../../Theme'
+import { updateNameData } from '../../utils/data'
 
 const Container = styled.div`
   height: 48px;
@@ -37,8 +38,7 @@ const Wrapper = styled.div`
   justify-content: flex-end;
   padding: 12px 16px;
   border-radius: 12px;
-  background: ${({ theme, small, open }) =>
-    small ? (open ? transparentize(0.4, theme.bg1) : 'none') : transparentize(0.4, theme.bg6)};
+  background: ${({ theme, small, open }) => (small ? (open ? theme.bg6 : 'none') : transparentize(0.4, theme.bg6))};
   border-bottom-right-radius: ${({ open }) => (open ? '0px' : '12px')};
   border-bottom-left-radius: ${({ open }) => (open ? '0px' : '12px')};
   z-index: 9999;
@@ -50,11 +50,11 @@ const Wrapper = styled.div`
       ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
       : 'none'};
   @media screen and (max-width: 500px) {
-    background: ${({ theme }) => transparentize(0.4, theme.bg1)};
+    background: ${({ theme }) => theme.bg6};
     box-shadow: ${({ open }) =>
-      !open
-        ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
-        : 'none'};
+    !open
+      ? '0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) '
+      : 'none'};
   }
 `
 const Input = styled.input`
@@ -110,7 +110,7 @@ const Menu = styled.div`
   width: 100%;
   top: 50px;
   max-height: 540px;
-  overflow: scroll;
+  overflow: auto;
   left: 0;
   padding-bottom: 20px;
   background: ${({ theme }) => theme.bg6};
@@ -143,7 +143,7 @@ const Gray = styled.span`
 `
 
 const Blue = styled.span`
-  color: #2172E5;
+  color: #2172e5;
   :hover {
     cursor: pointer;
   }
@@ -185,22 +185,27 @@ export const Search = ({ small = false }) => {
       try {
         if (value?.length > 0) {
           let tokens = await client.query({
+            query: TOKEN_SEARCH,
             variables: {
               value: value ? value.toUpperCase() : '',
-              id: value
+              id: value,
             },
-            query: TOKEN_SEARCH
           })
 
           let pairs = await client.query({
             query: PAIR_SEARCH,
             variables: {
-              tokens: tokens.data.asSymbol?.map(t => t.id),
-              id: value
-            }
+              tokens: tokens.data.asSymbol?.map((t) => t.id),
+              id: value,
+            },
           })
-          setSearchedPairs(pairs.data.as0.concat(pairs.data.as1).concat(pairs.data.asAddress))
-          let foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
+
+          setSearchedPairs(
+            updateNameData(pairs.data.as0)
+              .concat(updateNameData(pairs.data.as1))
+              .concat(updateNameData(pairs.data.asAddress))
+          )
+          const foundTokens = tokens.data.asSymbol.concat(tokens.data.asAddress).concat(tokens.data.asName)
           setSearchedTokens(foundTokens)
         }
       } catch (e) {
@@ -214,11 +219,12 @@ export const Search = ({ small = false }) => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
   }
 
-  // add the searched tokens to the list if now found yet
+  // add the searched tokens to the list if not found yet
   allTokens = allTokens.concat(
-    searchedTokens.filter(searchedToken => {
+    searchedTokens.filter((searchedToken) => {
       let included = false
-      allTokens.map(token => {
+      updateNameData()
+      allTokens.map((token) => {
         if (token.id === searchedToken.id) {
           included = true
         }
@@ -231,7 +237,7 @@ export const Search = ({ small = false }) => {
   let uniqueTokens = []
   let found = {}
   allTokens &&
-    allTokens.map(token => {
+    allTokens.map((token) => {
       if (!found[token.id]) {
         found[token.id] = true
         uniqueTokens.push(token)
@@ -240,9 +246,9 @@ export const Search = ({ small = false }) => {
     })
 
   allPairs = allPairs.concat(
-    searchedPairs.filter(searchedPair => {
+    searchedPairs.filter((searchedPair) => {
       let included = false
-      allPairs.map(pair => {
+      allPairs.map((pair) => {
         if (pair.id === searchedPair.id) {
           included = true
         }
@@ -255,7 +261,7 @@ export const Search = ({ small = false }) => {
   let uniquePairs = []
   let pairsFound = {}
   allPairs &&
-    allPairs.map(pair => {
+    allPairs.map((pair) => {
       if (!pairsFound[pair.id]) {
         pairsFound[pair.id] = true
         uniquePairs.push(pair)
@@ -266,106 +272,100 @@ export const Search = ({ small = false }) => {
   const filteredTokenList = useMemo(() => {
     return uniqueTokens
       ? uniqueTokens
-          .sort((a, b) => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
-              return 1
+        .sort((a, b) => {
+          const tokenA = allTokenData[a.id]
+          const tokenB = allTokenData[b.id]
+          if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
+            return tokenA.oneDayVolumeUSD > tokenB.oneDayVolumeUSD ? -1 : 1
+          }
+          if (tokenA?.oneDayVolumeUSD && !tokenB?.oneDayVolumeUSD) {
+            return -1
+          }
+          if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
+            return tokenA?.totalLiquidity > tokenB?.totalLiquidity ? -1 : 1
+          }
+          return 1
+        })
+        .filter((token) => {
+          if (TOKEN_BLACKLIST.includes(token.id)) {
+            return false
+          }
+          const regexMatches = Object.keys(token).map((tokenEntryKey) => {
+            const isAddress = value.slice(0, 2) === '0x'
+            if (tokenEntryKey === 'id' && isAddress) {
+              return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
             }
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
-              return -1
+            if (tokenEntryKey === 'symbol' && !isAddress) {
+              return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
             }
-            const tokenA = allTokenData[a.id]
-            const tokenB = allTokenData[b.id]
-            if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return tokenA.oneDayVolumeUSD > tokenB.oneDayVolumeUSD ? -1 : 1
+            if (tokenEntryKey === 'name' && !isAddress) {
+              return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
             }
-            if (tokenA?.oneDayVolumeUSD && !tokenB?.oneDayVolumeUSD) {
-              return -1
-            }
-            if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return tokenA?.totalLiquidity > tokenB?.totalLiquidity ? -1 : 1
-            }
-            return 1
+            return false
           })
-          .filter(token => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
-              return false
-            }
-            const regexMatches = Object.keys(token).map(tokenEntryKey => {
-              const isAddress = value.slice(0, 2) === '0x'
-              if (tokenEntryKey === 'id' && isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (tokenEntryKey === 'symbol' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (tokenEntryKey === 'name' && !isAddress) {
-                return token[tokenEntryKey].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              return false
-            })
-            return regexMatches.some(m => m)
-          })
+          return regexMatches.some((m) => m)
+        })
       : []
   }, [allTokenData, uniqueTokens, value])
 
   const filteredPairList = useMemo(() => {
     return uniquePairs
       ? uniquePairs
-          .sort((a, b) => {
-            const pairA = allPairData[a.id]
-            const pairB = allPairData[b.id]
-            if (pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
-              return parseFloat(pairA.trackedReserveETH) > parseFloat(pairB.trackedReserveETH) ? -1 : 1
+        .sort((a, b) => {
+          const pairA = allPairData[a.id]
+          const pairB = allPairData[b.id]
+          if (pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
+            return parseFloat(pairA.trackedReserveETH) > parseFloat(pairB.trackedReserveETH) ? -1 : 1
+          }
+          if (pairA?.trackedReserveETH && !pairB?.trackedReserveETH) {
+            return -1
+          }
+          if (!pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
+            return 1
+          }
+          return 0
+        })
+        .filter((pair) => {
+          if (PAIR_BLACKLIST.includes(pair.id)) {
+            return false
+          }
+          if (value && value.includes(' ')) {
+            const pairA = value.split(' ')[0]?.toUpperCase()
+            const pairB = value.split(' ')[1]?.toUpperCase()
+            return (
+              (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
+              (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+            )
+          }
+          if (value && value.includes('-')) {
+            const pairA = value.split('-')[0]?.toUpperCase()
+            const pairB = value.split('-')[1]?.toUpperCase()
+            return (
+              (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
+              (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+            )
+          }
+          const regexMatches = Object.keys(pair).map((field) => {
+            const isAddress = value.slice(0, 2) === '0x'
+            if (field === 'id' && isAddress) {
+              return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
             }
-            if (pairA?.trackedReserveETH && !pairB?.trackedReserveETH) {
-              return -1
-            }
-            if (!pairA?.trackedReserveETH && pairB?.trackedReserveETH) {
-              return 1
-            }
-            return 0
-          })
-          .filter(pair => {
-            if (PAIR_BLACKLIST.includes(pair.id)) {
-              return false
-            }
-            if (value && value.includes(' ')) {
-              const pairA = value.split(' ')[0]?.toUpperCase()
-              const pairB = value.split(' ')[1]?.toUpperCase()
+            if (field === 'token0') {
               return (
-                (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
-                (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+                pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
+                pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
               )
             }
-            if (value && value.includes('-')) {
-              const pairA = value.split('-')[0]?.toUpperCase()
-              const pairB = value.split('-')[1]?.toUpperCase()
+            if (field === 'token1') {
               return (
-                (pair.token0.symbol.includes(pairA) || pair.token0.symbol.includes(pairB)) &&
-                (pair.token1.symbol.includes(pairA) || pair.token1.symbol.includes(pairB))
+                pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
+                pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
               )
             }
-            const regexMatches = Object.keys(pair).map(field => {
-              const isAddress = value.slice(0, 2) === '0x'
-              if (field === 'id' && isAddress) {
-                return pair[field].match(new RegExp(escapeRegExp(value), 'i'))
-              }
-              if (field === 'token0') {
-                return (
-                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
-                )
-              }
-              if (field === 'token1') {
-                return (
-                  pair[field].symbol.match(new RegExp(escapeRegExp(value), 'i')) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), 'i'))
-                )
-              }
-              return false
-            })
-            return regexMatches.some(m => m)
+            return false
           })
+          return regexMatches.some((m) => m)
+        })
       : []
   }, [allPairData, uniquePairs, value])
 
@@ -399,7 +399,7 @@ export const Search = ({ small = false }) => {
   const wrapperRef = useRef()
   const menuRef = useRef()
 
-  const handleClick = e => {
+  const handleClick = (e) => {
     if (
       !(menuRef.current && menuRef.current.contains(e.target)) &&
       !(wrapperRef.current && wrapperRef.current.contains(e.target))
@@ -428,15 +428,15 @@ export const Search = ({ small = false }) => {
             small
               ? ''
               : below410
-              ? 'Search...'
-              : below470
-              ? 'Search Materia...'
-              : below700
-              ? 'Search pairs and tokens...'
-              : 'Search Materia pairs and tokens...'
+                ? 'Search...'
+                : below470
+                  ? 'Search Materia...'
+                  : below700
+                    ? 'Search pairs and tokens...'
+                    : 'Search Materia pairs and tokens...'
           }
           value={value}
-          onChange={e => {
+          onChange={(e) => {
             setValue(e.target.value)
           }}
           onFocus={() => {
@@ -458,15 +458,9 @@ export const Search = ({ small = false }) => {
             </MenuItem>
           )}
           {filteredPairList &&
-            filteredPairList.slice(0, pairsShown).map(pair => {
-              if (pair?.token0?.id === '0x0C0488a2e3f5FdEb482Bf5A76AB1ef27A3658101') {
-                pair.token0.name = 'ETH (Wrapped)'
-                pair.token0.symbol = 'ETH'
-              }
-              if (pair?.token1.id === '0x0C0488a2e3f5FdEb482Bf5A76AB1ef27A3658101') {
-                pair.token1.name = 'ETH (Wrapped)'
-                pair.token1.symbol = 'ETH'
-              }
+            filteredPairList.slice(0, pairsShown).map((pair) => {
+              //format incorrect names
+              updateNameData(pair)
               return (
                 <BasicLink to={'/pair/' + pair.id} key={pair.id} onClick={onDismiss}>
                   <MenuItem>
@@ -499,7 +493,9 @@ export const Search = ({ small = false }) => {
               <TYPE.body>No results</TYPE.body>
             </MenuItem>
           )}
-          {filteredTokenList.slice(0, tokensShown).map(token => {
+          {filteredTokenList.slice(0, tokensShown).map((token) => {
+            // update displayed names
+            updateNameData({ token0: token })
             return (
               <BasicLink to={'/token/' + token.id} key={token.id} onClick={onDismiss}>
                 <MenuItem>

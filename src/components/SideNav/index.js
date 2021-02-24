@@ -165,21 +165,21 @@ function SideNav({ history }) {
           <AutoColumn gap="0.5rem" style={{ marginLeft: '.75rem', marginBottom: '4rem' }}>
             <HeaderText>
               <Link href="https://materiadex.com" target="_blank">
-                Materia
+                materiadex.com
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://materiadex.org/docs" target="_blank">
+              <Link href="https://materiadex.com/docs/materia" target="_blank">
                 Docs
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://discord.gg/RacY7BXs" target="_blank">
+              <Link href="https://discord.com/invite/jdYMZrv" target="_blank">
                 Discord
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://twitter.com/DexMateria" target="_blank">
+              <Link href="https://twitter.com/dexmateria" target="_blank">
                 Twitter
               </Link>
             </HeaderText>
@@ -197,10 +197,10 @@ function SideNav({ history }) {
           )}
         </DesktopWrapper>
       ) : (
-        <MobileWrapper>
-          <Title />
-        </MobileWrapper>
-      )}
+          <MobileWrapper>
+            <Title />
+          </MobileWrapper>
+        )}
     </Wrapper>
   )
 }

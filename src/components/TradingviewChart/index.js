@@ -13,7 +13,7 @@ dayjs.extend(utc)
 
 export const CHART_TYPES = {
   BAR: 'BAR',
-  AREA: 'AREA'
+  AREA: 'AREA',
 }
 
 const Wrapper = styled.div`
@@ -31,7 +31,7 @@ const TradingViewChart = ({
   field,
   title,
   width,
-  useWeekly = false
+  useWeekly = false,
 }) => {
   // reference for DOM element to create with chart
   const ref = useRef()
@@ -52,10 +52,10 @@ const TradingViewChart = ({
   }, [chartCreated, data, dataPrev, type])
 
   // parese the data and format for tardingview consumption
-  const formattedData = data?.map(entry => {
+  const formattedData = data?.map((entry) => {
     return {
       time: dayjs.unix(entry.date).utc().format('YYYY-MM-DD'),
-      value: parseFloat(entry[field])
+      value: parseFloat(entry[field]),
     }
   })
 
@@ -86,66 +86,66 @@ const TradingViewChart = ({
         height: HEIGHT,
         layout: {
           backgroundColor: 'transparent',
-          textColor: textColor
+          textColor: textColor,
         },
         rightPriceScale: {
           scaleMargins: {
             top: topScale,
-            bottom: 0
+            bottom: 0,
           },
-          borderVisible: false
+          borderVisible: false,
         },
         timeScale: {
-          borderVisible: false
+          borderVisible: false,
         },
         grid: {
           horzLines: {
             color: 'rgba(197, 203, 206, 0.5)',
-            visible: false
+            visible: false,
           },
           vertLines: {
             color: 'rgba(197, 203, 206, 0.5)',
-            visible: false
-          }
+            visible: false,
+          },
         },
         crosshair: {
           horzLine: {
             visible: false,
-            labelVisible: false
+            labelVisible: false,
           },
           vertLine: {
             visible: true,
             style: 0,
             width: 2,
             color: 'rgba(32, 38, 46, 0.1)',
-            labelVisible: false
-          }
+            labelVisible: false,
+          },
         },
         localization: {
-          priceFormatter: val => formattedNum(val, true)
-        }
+          priceFormatter: (val) => formattedNum(val, true),
+        },
       })
 
       var series =
         type === CHART_TYPES.BAR
           ? chart.addHistogramSeries({
-              color: '#2172E5',
-              priceFormat: {
-                type: 'volume'
-              },
-              scaleMargins: {
-                top: 0.32,
-                bottom: 0
-              },
-              lineColor: '#2172E5',
-              lineWidth: 3
-            })
+            color: '#ff007a',
+            priceFormat: {
+              type: 'volume',
+            },
+            scaleMargins: {
+              top: 0.32,
+              bottom: 0,
+            },
+            lineColor: '#ff007a',
+            lineWidth: 3,
+          })
           : chart.addAreaSeries({
-              topColor: '#2172E5',
-              bottomColor: 'rgba(33, 114, 229, 0)',
-              lineColor: '#2172E5',
-              lineWidth: 3
-            })
+            topColor: '#ff007a',
+            bottomColor: 'rgba(255, 0, 122, 0)',
+            lineColor: '#ff007a',
+            lineWidth: 3,
+          })
 
       series.setData(formattedData)
       var toolTip = document.createElement('div')
@@ -166,8 +166,7 @@ const TradingViewChart = ({
       // get the title of the chart
       function setLastBarText() {
         toolTip.innerHTML =
-          `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title} ${
-            type === CHART_TYPES.BAR && !useWeekly ? '(24hr)' : ''
+          `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title} ${type === CHART_TYPES.BAR && !useWeekly ? '(24hr)' : ''
           }</div>` +
           `<div style="font-size: 22px; margin: 4px 0px; color:${textColor}" >` +
           formattedNum(base ?? 0, true) +
@@ -177,7 +176,7 @@ const TradingViewChart = ({
       setLastBarText()
 
       // update the title when hovering on the chart
-      chart.subscribeCrosshairMove(function(param) {
+      chart.subscribeCrosshairMove(function (param) {
         if (
           param === undefined ||
           param.time === undefined ||
@@ -190,12 +189,12 @@ const TradingViewChart = ({
         } else {
           let dateStr = useWeekly
             ? dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day)
-                .startOf('week')
-                .format('MMMM D, YYYY') +
-              '-' +
-              dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day)
-                .endOf('week')
-                .format('MMMM D, YYYY')
+              .startOf('week')
+              .format('MMMM D, YYYY') +
+            '-' +
+            dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day)
+              .endOf('week')
+              .format('MMMM D, YYYY')
             : dayjs(param.time.year + '-' + param.time.month + '-' + param.time.day).format('MMMM D, YYYY')
           var price = param.seriesPrices.get(series)
 
@@ -226,7 +225,7 @@ const TradingViewChart = ({
     topScale,
     type,
     useWeekly,
-    width
+    width,
   ])
 
   // responsiveness

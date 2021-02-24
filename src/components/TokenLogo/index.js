@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { isAddress } from '../../utils/index.js'
-import PlaceHolder from '../../assets/placeholder.png'
 import EthereumLogo from '../../assets/eth.png'
 
 const BAD_IMAGES = {}
@@ -41,7 +40,9 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
   if (error || BAD_IMAGES[address]) {
     return (
       <Inline>
-        <Image {...rest} alt={''} src={PlaceHolder} size={size} />
+        <span {...rest} alt={''} style={{ fontSize: size }} role="img" aria-label="face">
+          🍪
+        </span>
       </Inline>
     )
   }
@@ -55,12 +56,15 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
   }
 
-  if (address?.toLowerCase() === '0x0C0488a2e3f5FdEb482Bf5A76AB1ef27A3658101') {
+  if (address?.toLowerCase() === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc') {
     return (
       <StyledEthereumLogo size={size} {...rest}>
         <img
           src={EthereumLogo}
-          style={{ boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)', borderRadius: '24px' }}
+          style={{
+            boxShadow: '0px 6px 10px rgba(0, 0, 0, 0.075)',
+            borderRadius: '24px',
+          }}
           alt=""
         />
       </StyledEthereumLogo>
@@ -78,7 +82,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
         alt={''}
         src={path}
         size={size}
-        onError={event => {
+        onError={(event) => {
           BAD_IMAGES[address] = true
           setError(true)
           event.preventDefault()

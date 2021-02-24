@@ -5,6 +5,7 @@ import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
 import { formattedNum, localNumber } from '../../utils'
 
+import UniPrice from '../UniPrice'
 import { TYPE } from '../../Theme'
 
 const Header = styled.div`
@@ -35,6 +36,22 @@ export default function GlobalStats() {
     <Header>
       <RowBetween style={{ padding: below816 ? '0.5rem' : '.5rem' }}>
         <RowFixed>
+          {!below400 && (
+            <TYPE.main
+              mr={'1rem'}
+              onMouseEnter={() => {
+                setShowPriceCard(true)
+              }}
+              onMouseLeave={() => {
+                setShowPriceCard(false)
+              }}
+              style={{ position: 'relative' }}
+            >
+              ETH Price: <Medium>{formattedEthPrice}</Medium>
+              {showPriceCard && <UniPrice />}
+            </TYPE.main>
+          )}
+
           {!below1180 && (
             <TYPE.main mr={'1rem'}>
               Transactions (24H): <Medium>{localNumber(oneDayTxns)}</Medium>

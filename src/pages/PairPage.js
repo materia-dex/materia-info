@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import 'feather-icons'
 import styled from 'styled-components'
@@ -27,9 +27,11 @@ import { useEthPrice } from '../contexts/GlobalData'
 import Warning from '../components/Warning'
 import { usePathDismissed, useSavedPairs } from '../contexts/LocalStorage'
 
-import { Bookmark, PlusCircle } from 'react-feather'
+import { Bookmark, PlusCircle, AlertCircle } from 'react-feather'
 import FormattedName from '../components/FormattedName'
 import { useListedTokens } from '../contexts/Application'
+import HoverText from '../components/HoverText'
+import { UNTRACKED_COPY } from '../constants'
 
 const DashboardWrapper = styled.div`
   width: 100%;
@@ -46,7 +48,7 @@ const PanelWrapper = styled.div`
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
-      grid-column: 1 / 4;
+      /* grid-column: 1 / 4; */
     }
 
     > * {
@@ -72,7 +74,7 @@ const TokenDetailsLayout = styled.div`
     grid-template-columns: 1fr;
     align-items: stretch;
     > * {
-      grid-column: 1 / 4;
+      /* grid-column: 1 / 4; */
       margin-bottom: 1rem;
     }
 
@@ -101,6 +103,13 @@ const HoverSpan = styled.span`
   }
 `
 
+const WarningIcon = styled(AlertCircle)`
+  stroke: ${({ theme }) => theme.text1};
+  height: 16px;
+  width: 16px;
+  opacity: 0.6;
+`
+
 const WarningGrouping = styled.div`
   opacity: ${({ disabled }) => disabled && '0.4'};
   pointer-events: ${({ disabled }) => disabled && 'none'};
@@ -118,7 +127,7 @@ function PairPage({ pairAddress, history }) {
     volumeChangeUSD,
     oneDayVolumeUntracked,
     volumeChangeUntracked,
-    liquidityChangeUSD
+    liquidityChangeUSD,
   } = usePairData(pairAddress)
 
   useEffect(() => {
@@ -128,35 +137,16 @@ function PairPage({ pairAddress, history }) {
   const transactions = usePairTransactions(pairAddress)
   const backgroundColor = useColor(pairAddress)
 
-  // liquidity
-  const liquidity = trackedReserveUSD
-    ? formattedNum(trackedReserveUSD, true)
-    : reserveUSD
-    ? formattedNum(reserveUSD, true)
-    : '-'
+  const formattedLiquidity = reserveUSD ? formattedNum(reserveUSD, true) : formattedNum(trackedReserveUSD, true)
+  const usingUntrackedLiquidity = !trackedReserveUSD && !!reserveUSD
   const liquidityChange = formattedPercent(liquidityChangeUSD)
 
-  // mark if using untracked liquidity
-  const [usingTracked, setUsingTracked] = useState(true)
-  useEffect(() => {
-    setUsingTracked(!trackedReserveUSD ? false : true)
-  }, [trackedReserveUSD])
-
-  // volume	  // volume
-  const volume =
-    oneDayVolumeUSD || oneDayVolumeUSD === 0
-      ? formattedNum(oneDayVolumeUSD === 0 ? oneDayVolumeUntracked : oneDayVolumeUSD, true)
-      : oneDayVolumeUSD === 0
-      ? '$0'
-      : '-'
-
-  // mark if using untracked volume
-  const [usingUtVolume, setUsingUtVolume] = useState(false)
-  useEffect(() => {
-    setUsingUtVolume(oneDayVolumeUSD === 0 ? true : false)
-  }, [oneDayVolumeUSD])
-
+  // volume
+  const volume = !!oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD, true) : formattedNum(oneDayVolumeUntracked, true)
+  const usingUtVolume = oneDayVolumeUSD === 0 && !!oneDayVolumeUntracked
   const volumeChange = formattedPercent(!usingUtVolume ? volumeChangeUSD : volumeChangeUntracked)
+
+  const showUSDWaning = usingUntrackedLiquidity | usingUtVolume
 
   // get fees	  // get fees
   const fees =
@@ -191,7 +181,7 @@ function PairPage({ pairAddress, history }) {
   useEffect(() => {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0
+      top: 0,
     })
   }, [])
 
@@ -223,7 +213,14 @@ function PairPage({ pairAddress, history }) {
         >
           <DashboardWrapper>
             <AutoColumn gap="40px" style={{ marginBottom: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  width: '100%',
+                }}
+              >
                 <RowFixed style={{ flexWrap: 'wrap', minWidth: '100px' }}>
                   <RowFixed>
                     {token0 && token1 && (
@@ -248,7 +245,9 @@ function PairPage({ pairAddress, history }) {
                 <RowFixed
                   ml={below900 ? '0' : '2.5rem'}
                   mt={below1080 && '1rem'}
-                  style={{ flexDirection: below1080 ? 'row-reverse' : 'initial' }}
+                  style={{
+                    flexDirection: below1080 ? 'row-reverse' : 'initial',
+                  }}
                 >
                   {!!!savedPairs[pairAddress] && !below1080 ? (
                     <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
@@ -281,7 +280,7 @@ function PairPage({ pairAddress, history }) {
                 width: 'fit-content',
                 marginTop: below900 ? '1rem' : '0',
                 marginBottom: below900 ? '0' : '2rem',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
               }}
             >
               <FixedPanel onClick={() => history.push(`/token/${token0?.id}`)}>
@@ -310,17 +309,28 @@ function PairPage({ pairAddress, history }) {
               </FixedPanel>
             </AutoRow>
             <>
-              {!below1080 && <TYPE.main fontSize={'1.125rem'}>Pair Stats</TYPE.main>}
+              {!below1080 && (
+                <RowFixed>
+                  <TYPE.main fontSize={'1.125rem'} mr="6px">
+                    Pair Stats
+                  </TYPE.main>
+                  {showUSDWaning ? (
+                    <HoverText text={UNTRACKED_COPY}>
+                      <WarningIcon />
+                    </HoverText>
+                  ) : null}
+                </RowFixed>
+              )}
               <PanelWrapper style={{ marginTop: '1.5rem' }}>
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Total Liquidity {!usingTracked ? '(Untracked)' : ''}</TYPE.main>
+                      <TYPE.main>Total Liquidity </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
                       <TYPE.main fontSize={'1.5rem'} lineHeight={1} fontWeight={500}>
-                        {liquidity}
+                        {formattedLiquidity}
                       </TYPE.main>
                       <TYPE.main>{liquidityChange}</TYPE.main>
                     </RowBetween>
@@ -329,7 +339,7 @@ function PairPage({ pairAddress, history }) {
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
-                      <TYPE.main>Volume (24hrs) {usingUtVolume && '(Untracked)'}</TYPE.main>
+                      <TYPE.main>Volume (24hrs) </TYPE.main>
                       <div />
                     </RowBetween>
                     <RowBetween align="flex-end">
@@ -354,7 +364,6 @@ function PairPage({ pairAddress, history }) {
                     </RowBetween>
                   </AutoColumn>
                 </Panel>
-
                 <Panel style={{ height: '100%' }}>
                   <AutoColumn gap="20px">
                     <RowBetween>
@@ -385,7 +394,12 @@ function PairPage({ pairAddress, history }) {
                     </Hover>
                   </AutoColumn>
                 </Panel>
-                <Panel style={{ gridColumn: below1080 ? '1' : '2/4', gridRow: below1080 ? '' : '1/5' }}>
+                <Panel
+                  style={{
+                    gridColumn: below1080 ? '1' : '2/4',
+                    gridRow: below1080 ? '' : '1/5',
+                  }}
+                >
                   <PairChart
                     address={pairAddress}
                     color={backgroundColor}
@@ -399,7 +413,7 @@ function PairPage({ pairAddress, history }) {
               </TYPE.main>{' '}
               <Panel
                 style={{
-                  marginTop: '1.5rem'
+                  marginTop: '1.5rem',
                 }}
               >
                 {transactions ? <TxnList transactions={transactions} /> : <Loader />}
@@ -410,7 +424,7 @@ function PairPage({ pairAddress, history }) {
               <Panel
                 rounded
                 style={{
-                  marginTop: '1.5rem'
+                  marginTop: '1.5rem',
                 }}
                 p={20}
               >
@@ -419,7 +433,8 @@ function PairPage({ pairAddress, history }) {
                     <TYPE.main>Pair Name</TYPE.main>
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />-
+                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                        -
                         <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
                       </RowFixed>
                     </TYPE.main>

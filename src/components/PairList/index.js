@@ -14,6 +14,8 @@ import DoubleTokenLogo from '../DoubleLogo'
 import FormattedName from '../FormattedName'
 import QuestionHelper from '../QuestionHelper'
 import { TYPE } from '../../Theme'
+import { PAIR_BLACKLIST } from '../../constants'
+import { AutoColumn } from '../Column'
 
 dayjs.extend(utc)
 
@@ -27,7 +29,7 @@ const PageButtons = styled.div`
 
 const Arrow = styled.div`
   color: ${({ theme }) => theme.primary1};
-  opacity: ${props => (props.faded ? 0.3 : 1)};
+  opacity: ${(props) => (props.faded ? 0.3 : 1)};
   padding: 0 20px;
   user-select: none;
   :hover {
@@ -45,6 +47,8 @@ const DashGrid = styled.div`
   grid-template-columns: 100px 1fr 1fr;
   grid-template-areas: 'name liq vol';
   padding: 0 1.125rem;
+
+  opacity: ${({ fade }) => (fade ? '0.6' : '1')};
 
   > * {
     justify-content: flex-end;
@@ -105,17 +109,37 @@ const SORT_FIELD = {
   VOL: 1,
   VOL_7DAYS: 3,
   FEES: 4,
-  APY: 5
+  APY: 5,
 }
 
-const FIELD_TO_VALUE = {
-  [SORT_FIELD.LIQ]: 'trackedReserveUSD', // sort with tracked volume only
-  [SORT_FIELD.VOL]: 'oneDayVolumeUSD',
-  [SORT_FIELD.VOL_7DAYS]: 'oneWeekVolumeUSD',
-  [SORT_FIELD.FEES]: 'oneDayVolumeUSD'
+const FIELD_TO_VALUE = (field, useTracked) => {
+  switch (field) {
+    case SORT_FIELD.LIQ:
+      return useTracked ? 'trackedReserveUSD' : 'reserveUSD'
+    case SORT_FIELD.VOL:
+      return useTracked ? 'oneDayVolumeUSD' : 'oneDayVolumeUntracked'
+    case SORT_FIELD.VOL_7DAYS:
+      return useTracked ? 'oneWeekVolumeUSD' : 'oneWeekVolumeUntracked'
+    case SORT_FIELD.FEES:
+      return useTracked ? 'oneDayVolumeUSD' : 'oneDayVolumeUntracked'
+    default:
+      return 'trackedReserveUSD'
+  }
 }
 
-function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
+const formatDataText = (value, trackedValue, supressWarning = false) => {
+  const showUntracked = value !== '$0' && !trackedValue & !supressWarning
+  return (
+    <AutoColumn gap="2px" style={{ opacity: showUntracked ? '0.7' : '1' }}>
+      <div style={{ textAlign: 'right' }}>{value}</div>
+      <TYPE.light fontSize={'9px'} style={{ textAlign: 'right' }}>
+        {showUntracked ? 'unstable' : '  '}
+      </TYPE.light>
+    </AutoColumn>
+  )
+}
+
+function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = false }) {
   const below600 = useMedia('(max-width: 600px)')
   const below740 = useMedia('(max-width: 740px)')
   const below1080 = useMedia('(max-width: 1080px)')
@@ -148,9 +172,34 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
     const pairData = pairs[pairAddress]
 
     if (pairData && pairData.token0 && pairData.token1) {
-      const liquidity = formattedNum(pairData.reserveUSD, true)
-      const volume = formattedNum(pairData.oneDayVolumeUSD, true)
-      const apy = formattedPercent((pairData.oneDayVolumeUSD * 0.003 * 365 * 100) / pairData.reserveUSD)
+      const liquidity = formattedNum(
+        !!pairData.trackedReserveUSD ? pairData.trackedReserveUSD : pairData.reserveUSD,
+        true
+      )
+
+      const volume = formattedNum(
+        pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked,
+        true
+      )
+
+      const apy = formattedPercent(
+        ((pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD : pairData.oneDayVolumeUntracked) * 0.003 * 365 * 100) /
+          (pairData.oneDayVolumeUSD ? pairData.trackedReserveUSD : pairData.reserveUSD)
+      )
+
+      const weekVolume = formattedNum(
+        pairData.oneWeekVolumeUSD ? pairData.oneWeekVolumeUSD : pairData.oneWeekVolumeUntracked,
+        true
+      )
+
+      const fees = formattedNum(
+        pairData.oneDayVolumeUSD ? pairData.oneDayVolumeUSD * 0.003 : pairData.oneDayVolumeUntracked * 0.003,
+        true
+      )
+
+      if (pairAddress === '0xf52f433b79d21023af94251958bed3b64a2b7930') {
+        console.log(apy.toString())
+      }
 
       return (
         <DashGrid style={{ height: '48px' }} disbaleLinks={disbaleLinks} focus={true}>
@@ -171,11 +220,15 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
               />
             </CustomLink>
           </DataText>
-          <DataText area="liq">{liquidity}</DataText>
-          <DataText area="vol">{volume}</DataText>
-          {!below1080 && <DataText area="volWeek">{formattedNum(pairData.oneWeekVolumeUSD, true)}</DataText>}
-          {!below1080 && <DataText area="fees">{formattedNum(pairData.oneDayVolumeUSD * 0.003, true)}</DataText>}
-          {!below1080 && <DataText area="apy">{apy}</DataText>}
+          <DataText area="liq">{formatDataText(liquidity, pairData.trackedReserveUSD)}</DataText>
+          <DataText area="vol">{formatDataText(volume, pairData.oneDayVolumeUSD)}</DataText>
+          {!below1080 && <DataText area="volWeek">{formatDataText(weekVolume, pairData.oneWeekVolumeUSD)}</DataText>}
+          {!below1080 && <DataText area="fees">{formatDataText(fees, pairData.oneDayVolumeUSD)}</DataText>}
+          {!below1080 && (
+            <DataText area="apy">
+              {formatDataText(apy, pairData.oneDayVolumeUSD, pairData.oneDayVolumeUSD === 0)}
+            </DataText>
+          )}
         </DashGrid>
       )
     } else {
@@ -186,6 +239,9 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
   const pairList =
     pairs &&
     Object.keys(pairs)
+      .filter(
+        (address) => !PAIR_BLACKLIST.includes(address) && (useTracked ? !!pairs[address].trackedReserveUSD : true)
+      )
       .sort((addressA, addressB) => {
         const pairA = pairs[addressA]
         const pairB = pairs[addressB]
@@ -194,7 +250,8 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           const apy1 = parseFloat(pairB.oneDayVolumeUSD * 0.003 * 356 * 100) / parseFloat(pairB.reserveUSD)
           return apy0 > apy1 ? (sortDirection ? -1 : 1) * 1 : (sortDirection ? -1 : 1) * -1
         }
-        return parseFloat(pairA[FIELD_TO_VALUE[sortedColumn]]) > parseFloat(pairB[FIELD_TO_VALUE[sortedColumn]])
+        return parseFloat(pairA[FIELD_TO_VALUE(sortedColumn, useTracked)]) >
+          parseFloat(pairB[FIELD_TO_VALUE(sortedColumn, useTracked)])
           ? (sortDirection ? -1 : 1) * 1
           : (sortDirection ? -1 : 1) * -1
       })
@@ -223,7 +280,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <Flex alignItems="center" justifyContent="flexEnd">
           <ClickableText
             area="liq"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.LIQ)
               setSortDirection(sortedColumn !== SORT_FIELD.LIQ ? true : !sortDirection)
             }}
@@ -234,7 +291,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         <Flex alignItems="center">
           <ClickableText
             area="vol"
-            onClick={e => {
+            onClick={(e) => {
               setSortedColumn(SORT_FIELD.VOL)
               setSortDirection(sortedColumn !== SORT_FIELD.VOL ? true : !sortDirection)
             }}
@@ -247,7 +304,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="volWeek"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.VOL_7DAYS)
                 setSortDirection(sortedColumn !== SORT_FIELD.VOL_7DAYS ? true : !sortDirection)
               }}
@@ -260,7 +317,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="fees"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.FEES)
                 setSortDirection(sortedColumn !== SORT_FIELD.FEES ? true : !sortDirection)
               }}
@@ -273,7 +330,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
           <Flex alignItems="center" justifyContent="flexEnd">
             <ClickableText
               area="apy"
-              onClick={e => {
+              onClick={(e) => {
                 setSortedColumn(SORT_FIELD.APY)
                 setSortDirection(sortedColumn !== SORT_FIELD.APY ? true : !sortDirection)
               }}
@@ -288,7 +345,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
       <List p={0}>{!pairList ? <LocalLoader /> : pairList}</List>
       <PageButtons>
         <div
-          onClick={e => {
+          onClick={(e) => {
             setPage(page === 1 ? page : page - 1)
           }}
         >
@@ -296,7 +353,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10 }) {
         </div>
         <TYPE.body>{'Page ' + page + ' of ' + maxPage}</TYPE.body>
         <div
-          onClick={e => {
+          onClick={(e) => {
             setPage(page === maxPage ? page : page + 1)
           }}
         >

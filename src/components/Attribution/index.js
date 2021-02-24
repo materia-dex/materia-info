@@ -8,7 +8,7 @@ const Attribution = () => (
     |{' '}
     <a href="https://materiadex.com" rel="noopener noreferrer" target="_blank">
       Materia
-    </a>{' '}
+    </a>
   </p>
 )
 
