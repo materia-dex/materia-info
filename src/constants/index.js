@@ -6,6 +6,8 @@ export const WUSD_ADDRESS = '0x7c974104df9dd7fb91205ab3d66d15aff1049de8'
 export const IETH_ADDRESS = '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc'
 export const WUSD_IETH_PAIR = '0x7f8e6c3e07172fb7a029f5c5be17d8f5128322b6'
 
+export const MINING_POSITIONS_ENABLED = false
+
 export const timeframeOptions = {
   WEEK: '1 week',
   MONTH: '1 month',
