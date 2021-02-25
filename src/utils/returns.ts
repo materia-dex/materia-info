@@ -2,6 +2,7 @@ import { USER_MINTS_BUNRS_PER_PAIR } from '../apollo/queries'
 import { client } from '../apollo/client'
 import dayjs from 'dayjs'
 import { getShareValueOverTime } from '.'
+import { IETH_ADDRESS } from '../constants'
 
 export const priceOverrides = [
   '0x7a3428F1CBA2756aB9a6D672311ca6C8DcE65C6B', // iUSDC
@@ -28,7 +29,7 @@ interface Position {
   token1PriceUSD: number
 }
 
-const PRICE_DISCOVERY_START_TIMESTAMP = 1589747086
+const PRICE_DISCOVERY_START_TIMESTAMP = 1613951558
 
 function formatPricesForEarlyTimestamps(position): Position {
   if (position.timestamp < PRICE_DISCOVERY_START_TIMESTAMP) {
@@ -38,11 +39,11 @@ function formatPricesForEarlyTimestamps(position): Position {
     if (priceOverrides.includes(position?.pair?.token1.id)) {
       position.token1PriceUSD = 1
     }
-    // WETH price
-    if (position.pair?.token0.id === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc') {
+    // IETH price
+    if (position.pair?.token0.id === IETH_ADDRESS) {
       position.token0PriceUSD = 203
     }
-    if (position.pair?.token1.id === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc') {
+    if (position.pair?.token1.id === IETH_ADDRESS) {
       position.token1PriceUSD = 203
     }
   }

@@ -1,3 +1,5 @@
+import { IETH_ADDRESS } from "../constants"
+
 interface BasicData {
   token0?: {
     id: string
@@ -15,13 +17,9 @@ interface BasicData {
 // names since entitiy was created in subgraph
 // keys are lowercase token addresses <--------
 const TOKEN_OVERRIDES: { [address: string]: { name: string; symbol: string } } = {
-  '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc': {
+  [IETH_ADDRESS]: {
     name: 'Ether (Wrapped)',
     symbol: 'ETH',
-  },
-  '0x1416946162b1c2c871a73b07e932d2fb6c932069': {
-    name: 'Energi',
-    symbol: 'NRGE',
   },
 }
 

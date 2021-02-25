@@ -5,7 +5,7 @@ import { ethers } from 'ethers'
 import utc from 'dayjs/plugin/utc'
 import { client, blockClient } from '../apollo/client'
 import { GET_BLOCK, GET_BLOCKS, SHARE_VALUE } from '../apollo/queries'
-import { WUSD_ADDRESS } from '../constants'
+import { WUSD_ADDRESS, IETH_ADDRESS } from '../constants'
 import { Text } from 'rebass'
 import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
@@ -43,14 +43,13 @@ export function getPoolLink(token0Address, token1Address = null, remove = false)
     return (
       `https://materia.exchange/#/` +
       (remove ? `remove` : `add`) +
-      `/${WUSD_ADDRESS}/${token0Address === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc' ? 'ETH' : token0Address}`
+      `/${WUSD_ADDRESS}/${token0Address === IETH_ADDRESS ? 'ETH' : token0Address}`
     )
   } else {
     return (
       `https://materia.exchange/#/` +
       (remove ? `remove` : `add`) +
-      `/${token0Address === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc' ? 'ETH' : token0Address}/${
-        token1Address === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc' ? 'ETH' : token1Address
+      `/${token0Address === IETH_ADDRESS ? 'ETH' : token0Address}/${token1Address === IETH_ADDRESS ? 'ETH' : token1Address
       }`
     )
   }
@@ -60,9 +59,8 @@ export function getSwapLink(token0Address, token1Address = null) {
   if (!token1Address) {
     return `https://materia.exchange/#/swap?inputCurrency=${token0Address}`
   } else {
-    return `https://materia.exchange/#/swap?inputCurrency=${
-      token0Address === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc' ? 'ETH' : token0Address
-    }&outputCurrency=${token1Address === '0x1d6316dbbe18b6e9b75ae064aa114fe7dc208edc' ? 'ETH' : token1Address}`
+    return `https://materia.exchange/#/swap?inputCurrency=${token0Address === IETH_ADDRESS ? 'ETH' : token0Address
+      }&outputCurrency=${token1Address === IETH_ADDRESS ? 'ETH' : token1Address}`
   }
 }
 
