@@ -4,7 +4,6 @@ import { RowFixed, RowBetween } from '../Row'
 import { useMedia } from 'react-use'
 import { useGlobalData, useEthPrice } from '../../contexts/GlobalData'
 import { formattedNum, localNumber } from '../../utils'
-
 import StablePrice from '../StablePrice'
 import { TYPE } from '../../Theme'
 

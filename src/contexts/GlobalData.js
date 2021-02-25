@@ -264,24 +264,24 @@ async function getGlobalData(ethPrice, oldEthPrice) {
     })
     const twoWeekData = twoWeekResult.data.materiaFactories[0]
 
-    if (data && oneDayData && twoDayData && twoWeekData) {
-      let [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+    if (data) {
+      let [oneDayVolumeUSD, volumeChangeUSD] = oneDayData && twoDayData ? get2DayPercentChange(
         data.totalVolumeUSD,
         oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
         twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
-      )
+      ) : [0, 0]
 
-      const [oneWeekVolume, weeklyVolumeChange] = get2DayPercentChange(
+      const [oneWeekVolume, weeklyVolumeChange] = oneWeekData && twoWeekData ? get2DayPercentChange(
         data.totalVolumeUSD,
         oneWeekData.totalVolumeUSD,
         twoWeekData.totalVolumeUSD
-      )
+      ) : [0, 0]
 
-      const [oneDayTxns, txnChange] = get2DayPercentChange(
+      const [oneDayTxns, txnChange] = oneDayData && twoDayData ? get2DayPercentChange(
         data.txCount,
         oneDayData.txCount ? oneDayData.txCount : 0,
         twoDayData.txCount ? twoDayData.txCount : 0
-      )
+      ) : [0, 0]
 
       // format the total liquidity in USD
       data.totalLiquidityUSD = data.totalLiquidityETH * ethPrice
@@ -670,7 +670,7 @@ export function useTopLps() {
             if (results) {
               return results.liquidityPositions
             }
-          } catch (e) {}
+          } catch (e) { }
         })
       )
 
