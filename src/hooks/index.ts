@@ -5,8 +5,13 @@ import { hex } from 'wcag-contrast'
 import { isAddress } from '../utils'
 import copy from 'copy-to-clipboard'
 
-export function useColor(tokenAddress, token) {
-  const [color, setColor] = useState('#2172E5')
+export function useColor() {
+  const [color,] = useState('#1e9de3')
+  return color
+}
+
+export function useTokenColor(tokenAddress, token) {
+  const [color, setColor] = useState('#1e9de3')
   if (tokenAddress) {
     const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
       tokenAddress
