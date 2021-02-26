@@ -1,7 +1,7 @@
 {
   "name": "@materia-dex/info",
   "private": true,
-  "homepage": "https://info.materia.exchange",
+  "homepage": "https://info.materiadex.com",
   "devDependencies": {
     "@popperjs/core": "^2.4.2",
     "@reach/portal": "^0.10.3",
