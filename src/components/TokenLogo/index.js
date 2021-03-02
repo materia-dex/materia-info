@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { isAddress } from '../../utils/index.js'
 import EthereumLogo from '../../assets/eth.png'
 import { IETH_ADDRESS } from '../../constants'
+import { tokenInteroperableToSource } from '../../utils'
 
 const BAD_IMAGES = {}
 
@@ -48,14 +49,7 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  // hard coded fixes for trust wallet api issues
-  if (address?.toLowerCase() === '0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb') {
-    address = '0x42456d7084eacf4083f1140d3229471bba2949a8'
-  }
-
-  if (address?.toLowerCase() === '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f') {
-    address = '0xc011a72400e58ecd99ee497cf89e3775d4bd732f'
-  }
+  address = tokenInteroperableToSource(address?.toLowerCase())
 
   if (address?.toLowerCase() === IETH_ADDRESS) {
     return (

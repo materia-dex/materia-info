@@ -11,6 +11,7 @@ import _Decimal from 'decimal.js-light'
 import toFormat from 'toformat'
 import { timeframeOptions } from '../constants'
 import Numeral from 'numeral'
+import INTEROPERABLES from '../constants/interoperables'
 
 // format libraries
 const Decimal = toFormat(_Decimal)
@@ -479,4 +480,14 @@ export function isEquivalent(a, b) {
     }
   }
   return true
+}
+
+export const tokenInteroperableToSource = (interoperable) => {
+  if (!interoperable) {
+    return undefined
+  }
+
+  const token = INTEROPERABLES.find(x => x.interoperable.toLowerCase() === interoperable.toLowerCase())
+
+  return token ? token.source : interoperable
 }
