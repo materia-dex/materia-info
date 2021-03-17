@@ -152,7 +152,7 @@ function PositionList({ positions }) {
             <CustomLink to={'/pair/' + position.pair.id}>
               <TYPE.main style={{ whiteSpace: 'nowrap' }} to={'/pair/'}>
                 <FormattedName
-                  text={position.pair.token0.symbol + '-' + position.pair.token1.symbol}
+                  text={position.pair.token0.isymbol + '-' + position.pair.token1.isymbol}
                   maxCharacters={below740 ? 10 : 18}
                 />
               </TYPE.main>
@@ -183,7 +183,7 @@ function PositionList({ positions }) {
                   {formattedNum(poolOwnership * parseFloat(position.pair.reserve0))}{' '}
                 </TYPE.small>
                 <FormattedName
-                  text={position.pair.token0.symbol}
+                  text={position.pair.token0.isymbol}
                   maxCharacters={below740 ? 10 : 18}
                   margin={true}
                   fontSize={'11px'}
@@ -194,7 +194,7 @@ function PositionList({ positions }) {
                   {formattedNum(poolOwnership * parseFloat(position.pair.reserve1))}{' '}
                 </TYPE.small>
                 <FormattedName
-                  text={position.pair.token1.symbol}
+                  text={position.pair.token1.isymbol}
                   maxCharacters={below740 ? 10 : 18}
                   margin={true}
                   fontSize={'11px'}
@@ -214,14 +214,14 @@ function PositionList({ positions }) {
                   <TYPE.small fontWeight={400}>
                     {parseFloat(position.pair.token0.derivedETH)
                       ? formattedNum(
-                          position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
-                          false,
-                          true
-                        )
+                        position?.fees.sum / (parseFloat(position.pair.token0.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
+                      )
                       : 0}{' '}
                   </TYPE.small>
                   <FormattedName
-                    text={position.pair.token0.symbol}
+                    text={position.pair.token0.isymbol}
                     maxCharacters={below740 ? 10 : 18}
                     margin={true}
                     fontSize={'11px'}
@@ -231,14 +231,14 @@ function PositionList({ positions }) {
                   <TYPE.small fontWeight={400}>
                     {parseFloat(position.pair.token1.derivedETH)
                       ? formattedNum(
-                          position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
-                          false,
-                          true
-                        )
+                        position?.fees.sum / (parseFloat(position.pair.token1.derivedETH) * ethPrice) / 2,
+                        false,
+                        true
+                      )
                       : 0}{' '}
                   </TYPE.small>
                   <FormattedName
-                    text={position.pair.token1.symbol}
+                    text={position.pair.token1.isymbol}
                     maxCharacters={below740 ? 10 : 18}
                     margin={true}
                     fontSize={'11px'}

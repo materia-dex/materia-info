@@ -61,7 +61,7 @@ const PanelWrapper = styled.div`
 const TokenDetailsLayout = styled.div`
   display: inline-grid;
   width: 100%;
-  grid-template-columns: auto auto auto auto 1fr;
+  grid-template-columns: auto auto auto auto auto 1fr;
   column-gap: 60px;
   align-items: start;
 
@@ -168,8 +168,14 @@ function PairPage({ pairAddress, history }) {
   const token1Rate = reserve0 && reserve1 ? formattedNum(reserve0 / reserve1) : '-'
 
   // formatted symbols for overflow
-  const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
-  const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
+  const vsymbol0 = token0?.source !== " " ? token0?.isymbol + "/" + token0?.symbol : token0?.isymbol
+  const vsymbol1 = token1?.source !== " " ? token1?.isymbol + "/" + token1?.symbol : token1?.isymbol
+
+  const formattedSymbol0 = vsymbol0 > 6 ? vsymbol0.slice(0, 5) + '...' : vsymbol0
+  const formattedSymbol1 = vsymbol1 > 6 ? vsymbol1.slice(0, 5) + '...' : vsymbol1
+
+  // const formattedSymbol0 = token0?.symbol.length > 6 ? token0?.symbol.slice(0, 5) + '...' : token0?.symbol
+  // const formattedSymbol1 = token1?.symbol.length > 6 ? token1?.symbol.slice(0, 5) + '...' : token1?.symbol
 
   const below1080 = useMedia('(max-width: 1080px)')
   const below900 = useMedia('(max-width: 900px)')
@@ -227,10 +233,10 @@ function PairPage({ pairAddress, history }) {
                     <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} style={{ margin: '0 1rem' }}>
                       {token0 && token1 ? (
                         <>
-                          <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.symbol}</HoverSpan>
+                          <HoverSpan onClick={() => history.push(`/token/${token0?.id}`)}>{token0.isymbol}</HoverSpan>
                           <span>-</span>
                           <HoverSpan onClick={() => history.push(`/token/${token1?.id}`)}>
-                            {token1.symbol}
+                            {token1.isymbol}
                           </HoverSpan>{' '}
                           Pair
                         </>
@@ -248,7 +254,7 @@ function PairPage({ pairAddress, history }) {
                   }}
                 >
                   {!!!savedPairs[pairAddress] && !below1080 ? (
-                    <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.symbol, token1.symbol)}>
+                    <Hover onClick={() => addPair(pairAddress, token0.id, token1.id, token0.isymbol, token1.isymbol)}>
                       <StyledIcon>
                         <PlusCircle style={{ marginRight: '0.5rem' }} />
                       </StyledIcon>
@@ -372,7 +378,7 @@ function PairPage({ pairAddress, history }) {
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve0 ? formattedNum(reserve0) : ''}{' '}
-                            <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} margin={true} />
+                            <FormattedName text={token0?.isymbol ?? ''} maxCharacters={8} margin={true} />
                           </RowFixed>
                         </TYPE.main>
                       </AutoRow>
@@ -383,7 +389,7 @@ function PairPage({ pairAddress, history }) {
                         <TYPE.main fontSize={20} lineHeight={1} fontWeight={500}>
                           <RowFixed>
                             {reserve1 ? formattedNum(reserve1) : ''}{' '}
-                            <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} margin={true} />
+                            <FormattedName text={token1?.isymbol ?? ''} maxCharacters={8} margin={true} />
                           </RowFixed>
                         </TYPE.main>
                       </AutoRow>
@@ -429,9 +435,9 @@ function PairPage({ pairAddress, history }) {
                     <TYPE.main>Pair Name</TYPE.main>
                     <TYPE.main style={{ marginTop: '.5rem' }}>
                       <RowFixed>
-                        <FormattedName text={token0?.symbol ?? ''} maxCharacters={8} />
+                        <FormattedName text={token0?.isymbol ?? ''} maxCharacters={8} />
                         -
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />
+                        <FormattedName text={token1?.isymbol ?? ''} maxCharacters={8} />
                       </RowFixed>
                     </TYPE.main>
                   </Column>
@@ -461,7 +467,7 @@ function PairPage({ pairAddress, history }) {
                   <Column>
                     <TYPE.main>
                       <RowFixed>
-                        <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
+                        <FormattedName text={token1?.isymbol ?? ''} maxCharacters={8} />{' '}
                         <span style={{ marginLeft: '4px' }}>Address</span>
                       </RowFixed>
                     </TYPE.main>
@@ -472,6 +478,24 @@ function PairPage({ pairAddress, history }) {
                       <CopyHelper toCopy={token1?.id} />
                     </AutoRow>
                   </Column>
+
+                  {token1?.source !== " " ?
+                    <Column>
+                      <TYPE.main>
+                        <RowFixed>
+                          <FormattedName text={token1?.symbol ?? ''} maxCharacters={8} />{' '}
+                          <span style={{ marginLeft: '4px' }}>Address</span>
+                        </RowFixed>
+                      </TYPE.main>
+                      <AutoRow align="flex-end">
+                        <TYPE.main style={{ marginTop: '.5rem' }} fontSize={16}>
+                          {token1 && token1.source.slice(0, 6) + '...' + token1.source.slice(38, 42)}
+                        </TYPE.main>
+                        <CopyHelper toCopy={token1?.source} />
+                      </AutoRow>
+                    </Column>
+                    : <></>}
+
                   <ButtonLight color={backgroundColor}>
                     <Link color={backgroundColor} external href={'https://etherscan.io/address/' + pairAddress}>
                       View on Etherscan ↗

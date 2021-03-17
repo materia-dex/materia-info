@@ -104,6 +104,9 @@ function TokenPage({ address, history }) {
     id,
     name,
     symbol,
+    isymbol,
+    iname,
+    source,
     priceUSD,
     oneDayVolumeUSD,
     totalLiquidityUSD,
@@ -155,7 +158,8 @@ function TokenPage({ address, history }) {
 
   // format for long symbol
   const LENGTH = below1080 ? 10 : 16
-  const formattedSymbol = symbol?.length > LENGTH ? symbol.slice(0, LENGTH) + '...' : symbol
+  const vsymbol = source !== " " ? isymbol + "/" + symbol : isymbol
+  const formattedSymbol = vsymbol?.length > LENGTH ? vsymbol.slice(0, LENGTH) + '...' : vsymbol
 
   const [dismissed, markAsDismissed] = usePathDismissed(history.location.pathname)
   const [savedTokens, addToken] = useSavedTokens()
@@ -246,7 +250,7 @@ function TokenPage({ address, history }) {
                   <TokenLogo address={address} size="32px" style={{ alignSelf: 'center' }} />
                   <TYPE.main fontSize={below1080 ? '1.5rem' : '2rem'} fontWeight={500} style={{ margin: '0 1rem' }}>
                     <RowFixed gap="6px">
-                      <FormattedName text={name ? name + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
+                      <FormattedName text={iname ? iname + ' ' : ''} maxCharacters={16} style={{ marginRight: '6px' }} />{' '}
                       {formattedSymbol ? `(${formattedSymbol})` : ''}
                     </RowFixed>
                   </TYPE.main>{' '}
@@ -402,9 +406,11 @@ function TokenPage({ address, history }) {
             <Panel rounded>
               {transactions ? <TxnList color={backgroundColor} transactions={transactions} /> : <Loader />}
             </Panel>
+
+
             <>
               <RowBetween style={{ marginTop: '3rem' }}>
-                <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
+                <TYPE.main fontSize={'1.125rem'}>ITEM Information</TYPE.main>{' '}
               </RowBetween>
               <Panel
                 rounded
@@ -417,13 +423,13 @@ function TokenPage({ address, history }) {
                   <Column>
                     <TYPE.main>Symbol</TYPE.main>
                     <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      <FormattedName text={symbol} maxCharacters={12} />
+                      <FormattedName text={isymbol} maxCharacters={12} />
                     </Text>
                   </Column>
                   <Column>
                     <TYPE.main>Name</TYPE.main>
                     <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
-                      <FormattedName text={name} maxCharacters={16} />
+                      <FormattedName text={iname} maxCharacters={16} />
                     </TYPE.main>
                   </Column>
                   <Column>
@@ -443,6 +449,58 @@ function TokenPage({ address, history }) {
                 </TokenDetailsLayout>
               </Panel>
             </>
+
+
+            {source !== " " ?
+
+              <>
+                <RowBetween style={{ marginTop: '3rem' }}>
+                  <TYPE.main fontSize={'1.125rem'}>Token Information</TYPE.main>{' '}
+                </RowBetween>
+                <Panel
+                  rounded
+                  style={{
+                    marginTop: '1.5rem',
+                  }}
+                  p={20}
+                >
+                  <TokenDetailsLayout>
+                    <Column>
+                      <TYPE.main>Symbol</TYPE.main>
+                      <Text style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                        <FormattedName text={symbol} maxCharacters={12} />
+                      </Text>
+                    </Column>
+                    <Column>
+                      <TYPE.main>Name</TYPE.main>
+                      <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                        <FormattedName text={name} maxCharacters={16} />
+                      </TYPE.main>
+                    </Column>
+                    <Column>
+                      <TYPE.main>Address</TYPE.main>
+                      <AutoRow align="flex-end">
+                        <TYPE.main style={{ marginTop: '.5rem' }} fontSize={24} fontWeight="500">
+                          {source.slice(0, 8) + '...' + source.slice(36, 42)}
+                        </TYPE.main>
+                        <CopyHelper toCopy={source} />
+                      </AutoRow>
+                    </Column>
+                    <ButtonLight color={backgroundColor}>
+                      <Link color={backgroundColor} external href={'https://etherscan.io/address/' + source}>
+                        View on Etherscan ↗
+                  </Link>
+                    </ButtonLight>
+                  </TokenDetailsLayout>
+                </Panel>
+              </>
+
+              : <></>}
+
+
+
+
+
           </DashboardWrapper>
         </WarningGrouping>
       </ContentWrapper>

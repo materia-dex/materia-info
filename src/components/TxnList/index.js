@@ -193,8 +193,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.token0Amount = mint.amount0
           newTxn.token1Amount = mint.amount1
           newTxn.account = mint.to
-          newTxn.token0Symbol = updateNameData(mint.pair).token0.symbol
-          newTxn.token1Symbol = updateNameData(mint.pair).token1.symbol
+          newTxn.token0Symbol = updateNameData(mint.pair).token0.isymbol
+          newTxn.token1Symbol = updateNameData(mint.pair).token1.isymbol
           newTxn.amountUSD = mint.amountUSD
           return newTxns.push(newTxn)
         })
@@ -208,8 +208,8 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           newTxn.token0Amount = burn.amount0
           newTxn.token1Amount = burn.amount1
           newTxn.account = burn.sender
-          newTxn.token0Symbol = updateNameData(burn.pair).token0.symbol
-          newTxn.token1Symbol = updateNameData(burn.pair).token1.symbol
+          newTxn.token0Symbol = updateNameData(burn.pair).token0.isymbol
+          newTxn.token1Symbol = updateNameData(burn.pair).token1.isymbol
           newTxn.amountUSD = burn.amountUSD
           return newTxns.push(newTxn)
         })
@@ -222,13 +222,13 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           let newTxn = {}
 
           if (netToken0 < 0) {
-            newTxn.token0Symbol = updateNameData(swap.pair).token0.symbol
-            newTxn.token1Symbol = updateNameData(swap.pair).token1.symbol
+            newTxn.token0Symbol = updateNameData(swap.pair).token0.isymbol
+            newTxn.token1Symbol = updateNameData(swap.pair).token1.isymbol
             newTxn.token0Amount = Math.abs(netToken0)
             newTxn.token1Amount = Math.abs(netToken1)
           } else if (netToken1 < 0) {
-            newTxn.token0Symbol = updateNameData(swap.pair).token1.symbol
-            newTxn.token1Symbol = updateNameData(swap.pair).token0.symbol
+            newTxn.token0Symbol = updateNameData(swap.pair).token1.isymbol
+            newTxn.token1Symbol = updateNameData(swap.pair).token0.isymbol
             newTxn.token0Amount = Math.abs(netToken1)
             newTxn.token1Amount = Math.abs(netToken0)
           }
@@ -288,7 +288,7 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
           </Link>
         </DataText>
         <DataText area="value">
-          {currency === 'ETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
+          {currency === 'IETH' ? 'Ξ ' + formattedNum(item.valueETH) : formattedNum(item.amountUSD, true)}
         </DataText>
         {!below780 && (
           <>
@@ -322,41 +322,41 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
             <DropdownSelect options={TXN_TYPE} active={txFilter} setActive={setTxFilter} color={color} />
           </RowBetween>
         ) : (
-          <RowFixed area="txn" gap="10px" pl={4}>
-            <SortText
-              onClick={() => {
-                setTxFilter(TXN_TYPE.ALL)
-              }}
-              active={txFilter === TXN_TYPE.ALL}
-            >
-              All
+            <RowFixed area="txn" gap="10px" pl={4}>
+              <SortText
+                onClick={() => {
+                  setTxFilter(TXN_TYPE.ALL)
+                }}
+                active={txFilter === TXN_TYPE.ALL}
+              >
+                All
             </SortText>
-            <SortText
-              onClick={() => {
-                setTxFilter(TXN_TYPE.SWAP)
-              }}
-              active={txFilter === TXN_TYPE.SWAP}
-            >
-              Swaps
+              <SortText
+                onClick={() => {
+                  setTxFilter(TXN_TYPE.SWAP)
+                }}
+                active={txFilter === TXN_TYPE.SWAP}
+              >
+                Swaps
             </SortText>
-            <SortText
-              onClick={() => {
-                setTxFilter(TXN_TYPE.ADD)
-              }}
-              active={txFilter === TXN_TYPE.ADD}
-            >
-              Adds
+              <SortText
+                onClick={() => {
+                  setTxFilter(TXN_TYPE.ADD)
+                }}
+                active={txFilter === TXN_TYPE.ADD}
+              >
+                Adds
             </SortText>
-            <SortText
-              onClick={() => {
-                setTxFilter(TXN_TYPE.REMOVE)
-              }}
-              active={txFilter === TXN_TYPE.REMOVE}
-            >
-              Removes
+              <SortText
+                onClick={() => {
+                  setTxFilter(TXN_TYPE.REMOVE)
+                }}
+                active={txFilter === TXN_TYPE.REMOVE}
+              >
+                Removes
             </SortText>
-          </RowFixed>
-        )}
+            </RowFixed>
+          )}
 
         <Flex alignItems="center" justifyContent="flexStart">
           <ClickableText
@@ -427,15 +427,15 @@ function TxnList({ transactions, symbol0Override, symbol1Override, color }) {
         ) : filteredList.length === 0 ? (
           <EmptyCard>No recent transactions found.</EmptyCard>
         ) : (
-          filteredList.map((item, index) => {
-            return (
-              <div key={index}>
-                <ListItem key={index} index={index + 1} item={item} />
-                <Divider />
-              </div>
-            )
-          })
-        )}
+              filteredList.map((item, index) => {
+                return (
+                  <div key={index}>
+                    <ListItem key={index} index={index + 1} item={item} />
+                    <Divider />
+                  </div>
+                )
+              })
+            )}
       </List>
       <PageButtons>
         <div

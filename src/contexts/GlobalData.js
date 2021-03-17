@@ -683,7 +683,7 @@ export function useTopLps() {
             const pairData = allPairs[entry.pair.id]
             return topLps.push({
               user: entry.user,
-              pairName: pairData.token0.symbol + '-' + pairData.token1.symbol,
+              pairName: pairData.token0.isymbol + '-' + pairData.token1.isymbol,
               pairAddress: entry.pair.id,
               token0: pairData.token0.id,
               token1: pairData.token1.id,

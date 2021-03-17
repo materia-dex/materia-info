@@ -255,11 +255,13 @@ export const USER_POSITIONS = gql`
         token0 {
           id
           symbol
+          isymbol
           derivedETH
         }
         token1 {
           id
           symbol
+          isymbol
           derivedETH
         }
         totalSupply
@@ -282,10 +284,12 @@ export const USER_TRANSACTIONS = gql`
         token0 {
           id
           symbol
+          isymbol
         }
         token1 {
           id
           symbol
+          isymbol
         }
       }
       to
@@ -304,9 +308,11 @@ export const USER_TRANSACTIONS = gql`
         id
         token0 {
           symbol
+          isymbol
         }
         token1 {
           symbol
+          isymbol
         }
       }
       sender
@@ -325,9 +331,11 @@ export const USER_TRANSACTIONS = gql`
       pair {
         token0 {
           symbol
+          isymbol
         }
         token1 {
           symbol
+          isymbol
         }
       }
       amount0In
@@ -434,10 +442,12 @@ export const GLOBAL_TXNS = gql`
           token0 {
             id
             symbol
+            isymbol
           }
           token1 {
             id
             symbol
+            isymbol
           }
         }
         to
@@ -455,10 +465,12 @@ export const GLOBAL_TXNS = gql`
           token0 {
             id
             symbol
+            isymbol
           }
           token1 {
             id
             symbol
+            isymbol
           }
         }
         sender
@@ -476,10 +488,12 @@ export const GLOBAL_TXNS = gql`
           token0 {
             id
             symbol
+            isymbol
           }
           token1 {
             id
             symbol
+            isymbol
           }
         }
         amount0In
@@ -498,7 +512,10 @@ export const ALL_TOKENS = gql`
     tokens(first: 500, skip: $skip) {
       id
       name
+      source
       symbol
+      isymbol
+      iname
       totalLiquidity
     }
   }
@@ -508,20 +525,29 @@ export const TOKEN_SEARCH = gql`
   query tokens($value: String, $id: String) {
     asSymbol: tokens(where: { symbol_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
       id
+      source
       symbol
+      isymbol
       name
+      iname
       totalLiquidity
     }
     asName: tokens(where: { name_contains: $value }, orderBy: totalLiquidity, orderDirection: desc) {
       id
+      source
       symbol
+      isymbol
       name
+      iname
       totalLiquidity
     }
     asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
       id
+      source
       symbol
+      isymbol
       name
+      iname
       totalLiquidity
     }
   }
@@ -533,39 +559,57 @@ export const PAIR_SEARCH = gql`
       id
       token0 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
       token1 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
     }
     as1: pairs(where: { token1_in: $tokens }) {
       id
       token0 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
       token1 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
     }
     asAddress: pairs(where: { id: $id }) {
       id
       token0 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
       token1 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
     }
   }
@@ -577,13 +621,19 @@ export const ALL_PAIRS = gql`
       id
       token0 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
       token1 {
         id
+        source
         symbol
+        isymbol
         name
+        iname
       }
     }
   }
@@ -595,15 +645,21 @@ const PairFields = `
     txCount
     token0 {
       id
+      source
       symbol
+      isymbol
       name
+      iname
       totalLiquidity
       derivedETH
     }
     token1 {
       id
+      source
       symbol
+      isymbol
       name
+      iname
       totalLiquidity
       derivedETH
     }
@@ -725,6 +781,10 @@ const TokenFields = `
     id
     name
     symbol
+    source
+    isymbol
+    iname
+    idecimals
     derivedETH
     tradeVolume
     tradeVolumeUSD
@@ -784,10 +844,12 @@ export const FILTERED_TRANSACTIONS = gql`
         token0 {
           id
           symbol
+          isymbol
         }
         token1 {
           id
           symbol
+          isymbol
         }
       }
       to
@@ -805,10 +867,12 @@ export const FILTERED_TRANSACTIONS = gql`
         token0 {
           id
           symbol
+          isymbol
         }
         token1 {
           id
           symbol
+          isymbol
         }
       }
       sender
@@ -827,10 +891,12 @@ export const FILTERED_TRANSACTIONS = gql`
         token0 {
           id
           symbol
+          isymbol
         }
         token1 {
           id
           symbol
+          isymbol
         }
       }
       amount0In

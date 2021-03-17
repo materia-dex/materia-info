@@ -209,7 +209,7 @@ function PairList({ pairs, color, disbaleLinks, maxItems = 10, useTracked = fals
             />
             <CustomLink style={{ marginLeft: '20px', whiteSpace: 'nowrap' }} to={'/pair/' + pairAddress} color={color}>
               <FormattedName
-                text={pairData.token0.symbol + '-' + pairData.token1.symbol}
+                text={pairData.token0.isymbol + '-' + pairData.token1.isymbol}
                 maxCharacters={below600 ? 8 : 16}
                 adjustSize={true}
                 link={true}

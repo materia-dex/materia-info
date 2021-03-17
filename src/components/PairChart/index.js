@@ -71,9 +71,9 @@ const PairChart = ({ address, color, base0, base1 }) => {
 
   // formatted symbols for overflow
   const formattedSymbol0 =
-    pairData?.token0?.symbol.length > 6 ? pairData?.token0?.symbol.slice(0, 5) + '...' : pairData?.token0?.symbol
+    pairData?.token0?.isymbol.length > 6 ? pairData?.token0?.isymbol.slice(0, 5) + '...' : pairData?.token0?.isymbol
   const formattedSymbol1 =
-    pairData?.token1?.symbol.length > 6 ? pairData?.token1?.symbol.slice(0, 5) + '...' : pairData?.token1?.symbol
+    pairData?.token1?.isymbol.length > 6 ? pairData?.token1?.isymbol.slice(0, 5) + '...' : pairData?.token1?.isymbol
 
   const below1600 = useMedia('(max-width: 1600px)')
   const below1080 = useMedia('(max-width: 1080px)')
