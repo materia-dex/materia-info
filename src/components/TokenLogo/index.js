@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { isAddress } from '../../utils/index.js'
 import EthereumLogo from '../../assets/eth.png'
-import { IETH_ADDRESS } from '../../constants'
+import { IETH_ADDRESS, GIL_ADDRESS } from '../../constants'
 import { tokenInteroperableToSource } from '../../utils'
 
 const BAD_IMAGES = {}
@@ -66,9 +66,11 @@ export default function TokenLogo({ address, header = false, size = '24px', ...r
     )
   }
 
-  const path = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
-    address
-  )}/logo.png`
+  const path = address?.toLowerCase() === GIL_ADDRESS
+    ? `https://raw.githubusercontent.com/materia-dex/materia-token-list/master/resources/gil.png`
+    : `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${isAddress(
+      address
+    )}/logo.png`
 
   return (
     <Inline>
